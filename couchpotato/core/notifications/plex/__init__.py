@@ -44,6 +44,13 @@ config = [{
                     'description': 'Required for myPlex'
                 },
                 {
+                    'name': 'port',
+                    'label': 'Port',
+                    'default': 32400,
+                    'advanced': True,
+                    'description': 'Port of the Plex server'
+                },
+                {
                     'name': 'clients',
                     'default': '',
                     'description': 'Comma separated list of client names\'s (computer names). Top right when you start Plex'

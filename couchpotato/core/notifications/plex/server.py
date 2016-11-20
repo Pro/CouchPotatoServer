@@ -32,13 +32,17 @@ class PlexServer(object):
             log.warning("Plex media server hostname is required")
             return None
 
+        if not self.plex.conf('port'):
+            log.warning("Plex media server port is required")
+            return None
+
         if path.startswith('/'):
             path = path[1:]
 
         #Maintain support for older Plex installations without myPlex
         if not self.plex.conf('auth_token') and not self.plex.conf('username') and not self.plex.conf('password'):
             data = self.plex.urlopen('%s/%s' % (
-                self.createHost(self.plex.conf('media_server'), port = 32400),
+                self.createHost(self.plex.conf('media_server'), port = self.plex.conf('port')),
                 path
             ))
         else:
@@ -70,7 +74,7 @@ class PlexServer(object):
 
             #Add X-Plex-Token header for myPlex support workaround
             data = self.plex.urlopen('%s/%s?X-Plex-Token=%s' % (
-                self.createHost(self.plex.conf('media_server'), port = 32400),
+                self.createHost(self.plex.conf('media_server'), port = self.plex.conf('port')),
                 path,
                 self.plex.conf('auth_token')
             ))
@@ -132,8 +136,8 @@ class PlexServer(object):
 
                 self.request('library/sections/%s/refresh' % section.get('key'), 'text')
         except:
-            log.error('Plex library update failed for %s, Media Server not running: %s',
-                      (self.plex.conf('media_server'), traceback.format_exc(1)))
+            log.error('Plex library update failed for %s:%d, Media Server not running: %s',
+                      (self.plex.conf('media_server'), self.plex.conf('port'), traceback.format_exc(1)))
             return False
 
         return True
